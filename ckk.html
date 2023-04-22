@@ -1,49 +1,64 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Emergency Alert System</title>
+    <meta name="description" content="Fall Detection site" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fall Detection</title>
   </head>
   <body>
-    <h1>Emergency Alert System</h1>
-    <p>Acceleration: <span id="acceleration">0</span></p>
-    <p>Location: <span id="location">Unknown</span></p>
+<h1>Check</h1>
+<p>Location: <span id="location">Unknown</span></p>
 
-    <script>
-      // Get acceleration and location data
-      if (window.DeviceMotionEvent) {
-        window.addEventListener("devicemotion", handleAccelerationEvent, true);
-      }
-      if (navigator.geolocation) {
-        navigator.geolocation.watchPosition(handleLocationUpdate);
-      }
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-      function handleAccelerationEvent(event) {
-        let acceleration = event.accelerationIncludingGravity;
-        let accelerationMagnitude = Math.sqrt(
-          acceleration.x * acceleration.x +
-            acceleration.y * acceleration.y +
-            acceleration.z * acceleration.z
-        );
-        
-        // Update the acceleration value on webpage
-        document.getElementById("acceleration").innerHTML = accelerationMagnitude;
+  <script>
+    // Check if the DeviceMotionEvent is supported
+    if (window.DeviceMotionEvent) {
+      // Add an event listener to the window object
+      window.addEventListener('devicemotion', function (event) {
+        // Get the accelerometer data from the event object
+        var acceleration = event.acceleration;
+        var accelerationIncludingGravity = event.accelerationIncludingGravity;
+        var rotationRate = event.rotationRate;
+        var interval = event.interval;
 
-        // Check if acceleration is above 10
+        // Check if the acceleration is above 10
+        var accelerationMagnitude = Math.sqrt(acceleration.x * acceleration.x + acceleration.y * acceleration.y + acceleration.z * acceleration.z);
         if (accelerationMagnitude > 10) {
-       var to = "+919151793170";
-	var message = "Help";
-	$.ajax({
-		type: "POST",
-	        url: "https://api.twilio.com/2010-04-01/Accounts/ACba7215b3e1db467217fc81831151a9be/Messages.json",
-		headers: {
-		 "Authorization": "Basic " + btoa("ACba7215b3e1db467217fc81831151a9be:cafffc60cc5721485eee1e61c2b33103")
-		},
-		data: {
-		"To": to,
-		"From": "+15744987518",
-			"Body": message
-			},
+          // Send the acceleration data to the server using Ajax
+          var xhr = new XMLHttpRequest();
+          xhr.open('POST', '/acceleration-data', true);
+          xhr.setRequestHeader('Content-Type', 'application/json');
+          xhr.send(JSON.stringify({
+            acceleration: acceleration,
+            accelerationIncludingGravity: accelerationIncludingGravity,
+            rotationRate: rotationRate,
+            interval: interval
+          }));
+
+          // Display the acceleration data on the webpage
+          document.getElementById('acceleration').innerHTML = acceleration.x + ', ' + acceleration.y + ', ' + acceleration.z;
+          document.getElementById('acceleration-including-gravity').innerHTML = accelerationIncludingGravity.x + ', ' + accelerationIncludingGravity.y + ', ' + accelerationIncludingGravity.z;
+          document.getElementById('rotation-rate').innerHTML = rotationRate.alpha + ', ' + rotationRate.beta + ', ' + rotationRate.gamma;
+          document.getElementById('interval').innerHTML = interval;
+
+
+
+          function sendSMS() {
+			var to = "+919151793170";
+			var message = "Help";
+			$.ajax({
+				type: "POST",
+				url: "https://api.twilio.com/2010-04-01/Accounts/ACba7215b3e1db467217fc81831151a9be/Messages.json",
+				headers: {
+					"Authorization": "Basic " + btoa("ACba7215b3e1db467217fc81831151a9be:cafffc60cc5721485eee1e61c2b33103")
+				},
+				data: {
+					"To": to,
+					"From": "+15744987518",
+					"Body": message
+				},
 				success: function(response) {
 					alert("SMS sent successfully!");
 				},
@@ -51,15 +66,25 @@
 					alert("Failed to send SMS!");
 				}
 			});
-        }
-      }
+		}
 
+        if(accelerationMagnitude>10){
+            sendSMS();
+        }
+
+        }
+      });
       function handleLocationUpdate(position) {
         // Update the location value on webpage
         let latitude = position.coords.latitude;
         let longitude = position.coords.longitude;
         document.getElementById("location").innerHTML = latitude + ", " + longitude;
       }
-    </script>
+
+    } else {
+      // The DeviceMotionEvent is not supported
+      alert('DeviceMotionEvent is not supported.');
+    }
+  </script>
   </body>
 </html>
