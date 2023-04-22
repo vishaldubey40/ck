@@ -31,19 +31,19 @@
 
         // Check if acceleration is above 10
         if (accelerationMagnitude > 10) {
-      var to = "+919151793170";
-			var message = "Help";
-		$.ajax({
-				type: "POST",
-url: "https://api.twilio.com/2010-04-01/Accounts/ACba7215b3e1db467217fc81831151a9be/Messages.json",
-				headers: {
-					"Authorization": "Basic " + btoa("ACba7215b3e1db467217fc81831151a9be:cafffc60cc5721485eee1e61c2b33103")
-				},
-				data: {
-					"To": to,
-					"From": "+15744987518",
-					"Body": message
-				},
+       var to = "+919151793170";
+	var message = "Help";
+	$.ajax({
+		type: "POST",
+	        url: "https://api.twilio.com/2010-04-01/Accounts/ACba7215b3e1db467217fc81831151a9be/Messages.json",
+		headers: {
+		 "Authorization": "Basic " + btoa("ACba7215b3e1db467217fc81831151a9be:cafffc60cc5721485eee1e61c2b33103")
+		},
+		data: {
+		"To": to,
+		"From": "+15744987518",
+			"Body": message
+			},
 				success: function(response) {
 					alert("SMS sent successfully!");
 				},
