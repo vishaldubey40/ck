@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Emergency Alert System</title>
+  </head>
+  <body>
+    <h1>Emergency Alert System</h1>
+    <p>Acceleration: <span id="acceleration">0</span></p>
+    <p>Location: <span id="location">Unknown</span></p>
+
+    <script>
+      // Get acceleration and location data
+      if (window.DeviceMotionEvent) {
+        window.addEventListener("devicemotion", handleAccelerationEvent, true);
+      }
+      if (navigator.geolocation) {
+        navigator.geolocation.watchPosition(handleLocationUpdate);
+      }
+
+      function handleAccelerationEvent(event) {
+        let acceleration = event.accelerationIncludingGravity;
+        let accelerationMagnitude = Math.sqrt(
+          acceleration.x * acceleration.x +
+            acceleration.y * acceleration.y +
+            acceleration.z * acceleration.z
+        );
+        
+        // Update the acceleration value on webpage
+        document.getElementById("acceleration").innerHTML = accelerationMagnitude;
+
+        // Check if acceleration is above 10
+        if (accelerationMagnitude > 10) {
+      var to = "+919151793170";
+			var message = "Help";
+		$.ajax({
+				type: "POST",
+url: "https://api.twilio.com/2010-04-01/Accounts/ACba7215b3e1db467217fc81831151a9be/Messages.json",
+				headers: {
+					"Authorization": "Basic " + btoa("ACba7215b3e1db467217fc81831151a9be:cafffc60cc5721485eee1e61c2b33103")
+				},
+				data: {
+					"To": to,
+					"From": "+15744987518",
+					"Body": message
+				},
+				success: function(response) {
+					alert("SMS sent successfully!");
+				},
+				error: function(XMLHttpRequest, textStatus, errorThrown) {
+					alert("Failed to send SMS!");
+				}
+			});
+        }
+      }
+
+      function handleLocationUpdate(position) {
+        // Update the location value on webpage
+        let latitude = position.coords.latitude;
+        let longitude = position.coords.longitude;
+        document.getElementById("location").innerHTML = latitude + ", " + longitude;
+      }
+    </script>
+  </body>
+</html>
